@@ -1,0 +1,32 @@
+[package]
+name = "webserver-rs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+salvo = { version = "0.49", features = ["jwt-auth"] }
+tokio = { version = "1", features = ["macros"] }
+config-file = "0.2.3"
+serde = "1.0.163"
+tracing-subscriber = { version = "0.3.17", features = [
+	"env-filter",
+	"time",
+	"local-time",
+] }
+tracing-appender = "0.2.2"
+tracing = "0.1.37"
+time = { version = "0.3.21", features = ["macros"] }
+chrono = "0.4.26"
+sea-orm = { version = "0.12", features = ["runtime-tokio-rustls", "macros"] }
+openssl = { version = "*", features = ["vendored"] }
+anyhow = "1.0.71"
+serde_json = "1.0.96"
+jsonwebtoken = "8.0"
+
+[features]
+mysql = ["sea-orm/sqlx-mysql"]
+sqlite = ["sea-orm/sqlx-sqlite"]
+postgres = ["sea-orm/sqlx-postgres"]
+http3 = ["salvo/quinn"]
