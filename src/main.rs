@@ -1,13 +1,14 @@
-#[macro_use]
+
 mod route;
 mod web_core;
+
 
 use config_file::FromConfigFile;
 
 use web_core::{
     authorization,
     config::{Config, InjectConfig},
-    db_pool, log,
+    db_pool, log, assets,
 };
 
 use salvo::jwt_auth::HeaderFinder;
@@ -40,7 +41,7 @@ async fn main() -> anyhow::Result<()> {
             .hoop(jwt_auth)
             .hoop(config_provider)
     };
-    let root_router = root_router.push(route::gen_router(config.secret_key));
+    let root_router = root_router.push(route::gen_router(config.secret_key)).push(assets::common_assets(config.pub_dir, true));
     #[cfg(feature = "http3")]
     {
         let cert_and_key = web_core::config::read_cert_and_key(config.http3).await?;

@@ -61,3 +61,13 @@ pub fn login(depot: &mut Depot, res: &mut Response) -> AnyResult<()> {
     res.render(Text::Plain(token));
     Ok(())
 }
+
+
+pub mod ab{
+    use salvo::handler;
+
+	#[handler]
+	pub fn show()->&'static str{
+		"abc"
+	}
+}
