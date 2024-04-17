@@ -4,8 +4,10 @@ use salvo::prelude::*;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use crate::web_core::error_catch::HttpErrorKind;
+use crate::web_core::error_catch::AnyHttpError;
+use crate::HttpErrorKind;
 
+#[allow(dead_code)]
 pub fn gen_jwt_auth<T: Send + Sync + DeserializeOwned + 'static>(
     secret_key: String,
     finders: Vec<Box<dyn JwtTokenFinder>>,
@@ -14,8 +16,6 @@ pub fn gen_jwt_auth<T: Send + Sync + DeserializeOwned + 'static>(
         .finders(finders)
         .force_passed(true)
 }
-
-
 
 #[allow(dead_code)]
 pub fn gen_token<T: Serialize + Send + Sync + 'static>(
@@ -28,13 +28,13 @@ pub fn gen_token<T: Serialize + Send + Sync + 'static>(
         &EncodingKey::from_secret(secret_key.as_bytes()),
     )
 }
-pub struct AuthGuard<F: Fn(JwtAuthState) -> HttpErrorKind + Send + Sync + 'static> {
+pub struct AuthGuard<F: Fn(JwtAuthState) -> AnyHttpError + Send + Sync + 'static> {
     f: F,
 }
 #[allow(dead_code)]
 impl<F> AuthGuard<F>
 where
-    F: Fn(JwtAuthState) -> HttpErrorKind + Send + Sync + 'static,
+    F: Fn(JwtAuthState) -> AnyHttpError + Send + Sync + 'static,
 {
     pub fn new(f: F) -> Self {
         Self { f }
@@ -43,7 +43,7 @@ where
 #[async_trait]
 impl<F> Handler for AuthGuard<F>
 where
-    F: Fn(JwtAuthState) -> HttpErrorKind + Send + Sync + 'static,
+    F: Fn(JwtAuthState) -> AnyHttpError + Send + Sync + 'static,
 {
     async fn handle(
         &self,
@@ -58,7 +58,7 @@ where
             }
             JwtAuthState::Unauthorized => {
                 res.status_code(StatusCode::UNAUTHORIZED);
-                match (self.f)(JwtAuthState::Unauthorized) {
+                match (self.f)(JwtAuthState::Unauthorized).1 {
                     HttpErrorKind::Html(v) => {
                         res.render(Text::Html(v));
                     }
@@ -70,7 +70,7 @@ where
             }
             JwtAuthState::Forbidden => {
                 res.status_code(StatusCode::FORBIDDEN);
-                match (self.f)(JwtAuthState::Forbidden) {
+                match (self.f)(JwtAuthState::Forbidden).1 {
                     HttpErrorKind::Html(v) => {
                         res.render(Text::Html(v));
                     }
@@ -84,42 +84,31 @@ where
     }
 }
 
-
 #[macro_export]
 macro_rules! expire_time {
-	(Days($day:expr)) => {
-		{
-			use time::{Duration, OffsetDateTime};
-			let tmp = OffsetDateTime::now_utc() + Duration::days($day);
-			tmp.unix_timestamp()
-		}
-	};
-	(Weeks($w:expr)) => {
-		{
-			use time::{Duration, OffsetDateTime};
-			let tmp = OffsetDateTime::now_utc() + Duration::weeks($w);
-			tmp.unix_timestamp()
-		}
-	};
-	(Hours($h:expr))=>{
-		{
-			use time::{Duration, OffsetDateTime};
-			let tmp = OffsetDateTime::now_utc() + Duration::hours($h);
-			tmp.unix_timestamp()
-		}
-	};
-	(Minutes($m:expr))=>{
-		{
-			use time::{Duration, OffsetDateTime};
-			let tmp = OffsetDateTime::now_utc() + Duration::minutes($m);
-			tmp.unix_timestamp()
-		}
-	};
-	(Seconds($s:expr))=>{
-		{
-			use time::{Duration, OffsetDateTime};
-			let tmp = OffsetDateTime::now_utc() + Duration::seconds($s);
-			tmp.unix_timestamp()
-		}
-	};
+    (Days($day:expr)) => {{
+        use time::{Duration, OffsetDateTime};
+        let tmp = OffsetDateTime::now_utc() + Duration::days($day);
+        tmp.unix_timestamp()
+    }};
+    (Weeks($w:expr)) => {{
+        use time::{Duration, OffsetDateTime};
+        let tmp = OffsetDateTime::now_utc() + Duration::weeks($w);
+        tmp.unix_timestamp()
+    }};
+    (Hours($h:expr)) => {{
+        use time::{Duration, OffsetDateTime};
+        let tmp = OffsetDateTime::now_utc() + Duration::hours($h);
+        tmp.unix_timestamp()
+    }};
+    (Minutes($m:expr)) => {{
+        use time::{Duration, OffsetDateTime};
+        let tmp = OffsetDateTime::now_utc() + Duration::minutes($m);
+        tmp.unix_timestamp()
+    }};
+    (Seconds($s:expr)) => {{
+        use time::{Duration, OffsetDateTime};
+        let tmp = OffsetDateTime::now_utc() + Duration::seconds($s);
+        tmp.unix_timestamp()
+    }};
 }

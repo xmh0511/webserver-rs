@@ -1,6 +1,9 @@
+pub mod assets;
+pub mod authorization;
 pub mod config;
 pub mod db_pool;
 pub mod error_catch;
 pub mod log;
-pub mod authorization;
-pub mod assets;
+
+#[allow(unused_imports)]
+pub use assets::MemoryStream;

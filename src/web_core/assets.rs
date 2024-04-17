@@ -1,11 +1,45 @@
-use salvo::prelude::*;
+use std::{collections::VecDeque, task::Poll};
+
+use futures::Stream;
+use salvo::{http::HeaderMap, prelude::*};
+
+use crate::AnyResult;
+
 #[allow(dead_code)]
-pub fn common_assets(pub_dir:String,listing:bool)->Router{
+pub(crate) fn common_assets(pub_dir: String, listing: bool) -> Router {
     Router::with_path("public/<**path>").get(
-        StaticDir::new([
-			pub_dir
-        ])
-        .defaults("index.html")
-        .listing(listing),
+        StaticDir::new([pub_dir])
+            .defaults("index.html")
+            .auto_list(listing),
     )
+}
+
+#[handler]
+pub(crate) async fn favicon_ico(res: &mut Response) -> AnyResult<()> {
+    res.send_file("./favicon.ico", &HeaderMap::new()).await;
+    Ok(())
+}
+
+pub struct MemoryStream(VecDeque<Vec<u8>>);
+
+impl MemoryStream {
+    #[allow(dead_code)]
+    pub fn new(data: Vec<u8>, chunk_size: usize) -> Self {
+        Self(data.chunks(chunk_size).map(|v| v.to_vec()).collect())
+    }
+}
+
+impl Stream for MemoryStream {
+    type Item = Result<Vec<u8>, std::io::Error>;
+
+    fn poll_next(
+        mut self: std::pin::Pin<&mut Self>,
+        _cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Option<Self::Item>> {
+        if let Some(frame) = self.0.pop_front() {
+            Poll::Ready(Some(Ok(frame)))
+        } else {
+            Poll::Ready(None)
+        }
+    }
 }

@@ -1,7 +1,7 @@
 use sea_orm::{Database, DatabaseConnection, DbErr};
 use std::sync::OnceLock;
 
-use super::error_catch::{AnyResult, HttpErrorKind, Option2AnyHttpResult};
+use super::error_catch::{AnyHttpError, AnyResult};
 
 static DBCONN_POOL: OnceLock<DatabaseConnection> = OnceLock::new();
 
@@ -10,10 +10,8 @@ async fn init_db_pool(protocol: &str) -> Result<(), DbErr> {
     Ok(())
 }
 #[allow(dead_code)]
-pub fn get_db_pool<F: FnMut() -> (u16, HttpErrorKind)>(
-    if_error: F,
-) -> AnyResult<&'static DatabaseConnection> {
-    DBCONN_POOL.get().to_result(if_error)
+pub fn get_db_pool<F: Fn() -> AnyHttpError>(if_error: F) -> AnyResult<&'static DatabaseConnection> {
+    DBCONN_POOL.get().ok_or(if_error())
 }
 
 #[allow(dead_code)]

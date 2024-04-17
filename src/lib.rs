@@ -1,47 +1,38 @@
+pub mod route;
+pub mod web_core;
 
-mod route;
-mod web_core;
+pub use web_core::*;
 
+pub use web_core::config::*;
 
-use config_file::FromConfigFile;
+pub use web_core::error_catch::*;
 
-use web_core::{
-    authorization,
-    config::{Config, InjectConfig},
-    db_pool, log, assets,
-};
-
-use salvo::jwt_auth::HeaderFinder;
 use salvo::prelude::*;
-use serde::{Deserialize, Serialize};
+
+pub use config_file::FromConfigFile;
+pub use route::build_cros;
+
+pub use salvo;
 
 #[cfg(feature = "http3")]
 use salvo::conn::rustls::{Keycert, RustlsConfig};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct JwtClaims {
-    username: String,
-    exp: i64,
-}
-
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    let config = Config::from_config_file("./config.toml").expect("config file not found");
+pub async fn serve(config: Config, serve_route: Router) -> anyhow::Result<()> {
     let config_provider = InjectConfig(config.clone());
     let _log_guard = log::set_log(config.log);
     db_pool::init_db_if_enable(&config.db_protocol).await?;
-    let jwt_auth = authorization::gen_jwt_auth::<JwtClaims>(
-        config.secret_key.clone(),
-        vec![Box::new(HeaderFinder::new())],
-    );
+
     let root_router = if config.route_root.is_empty() {
-        Router::new().hoop(jwt_auth).hoop(config_provider)
+        Router::new().hoop(config_provider)
     } else {
-        Router::with_path(config.route_root)
-            .hoop(jwt_auth)
-            .hoop(config_provider)
+        Router::with_path(config.route_root).hoop(config_provider)
     };
-    let root_router = root_router.push(route::gen_router(config.secret_key)).push(assets::common_assets(config.pub_dir, true));
+    let root_router = root_router
+        .push(serve_route)
+        .push(assets::common_assets(config.pub_dir, config.assets_listing));
+    let root_router = Router::new()
+        .push(Router::with_path("favicon.ico").get(assets::favicon_ico))
+        .push(root_router);
     #[cfg(feature = "http3")]
     {
         let cert_and_key = web_core::config::read_cert_and_key(config.http3).await?;

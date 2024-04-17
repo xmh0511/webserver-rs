@@ -2,29 +2,32 @@ use salvo::prelude::*;
 
 use serde_json::Value;
 
-pub type AnyResult<T> = Result<T,AnyHttpError>;
+pub type AnyResult<T> = Result<T, AnyHttpError>;
 #[allow(dead_code)]
 pub enum HttpErrorKind {
     Json(Value),
     Html(String),
 }
 
-
-pub struct AnyHttpError(StatusCode, HttpErrorKind);
+pub struct AnyHttpError(pub(crate) Option<StatusCode>, pub(crate) HttpErrorKind);
 
 impl AnyHttpError {
+    #[allow(dead_code)]
     pub fn new(code: u16, msg: HttpErrorKind) -> Self {
         Self(
-            StatusCode::from_u16(code).unwrap_or(StatusCode::BAD_REQUEST),
+            Some(StatusCode::from_u16(code).unwrap_or(StatusCode::BAD_REQUEST)),
             msg,
         )
+    }
+    pub fn new_msg(msg: HttpErrorKind) -> Self {
+        Self(None, msg)
     }
 }
 
 #[async_trait]
 impl Writer for AnyHttpError {
     async fn write(mut self, _req: &mut Request, _depot: &mut Depot, res: &mut Response) {
-        res.status_code(self.0);
+        res.status_code(self.0.unwrap_or(StatusCode::BAD_REQUEST));
         match self.1 {
             HttpErrorKind::Json(v) => res.render(Text::Json(v.to_string())),
             HttpErrorKind::Html(v) => res.render(Text::Html(v)),
@@ -32,37 +35,30 @@ impl Writer for AnyHttpError {
     }
 }
 
-pub trait Option2AnyHttpResult {
-    type Output;
-	fn to_result<F:FnMut()->(u16,HttpErrorKind)>(self,f:F)->Result<Self::Output, AnyHttpError>;
-}
-impl<T> Option2AnyHttpResult for Option<T> {
-    type Output = T;
-	fn to_result<F:FnMut()->(u16,HttpErrorKind)>(self,mut f:F)->Result<Self::Output, AnyHttpError>{
-		match self{
-			Some(v)=>Ok(v),
-			None=>{
-				let (code,msg) = f();
-				Err(AnyHttpError::new(code,msg))
-			}
+#[macro_export]
+macro_rules! json_err {
+	($status:expr, {$($t:tt)*}) => {
+		{
+			use $crate::web_core::error_catch;
+			error_catch::AnyHttpError::new($status,error_catch::HttpErrorKind::Json(::serde_json::json!({$($t)*})))
 		}
-	}
+	};
+	({$($t:tt)*}) => {
+		{
+			use $crate::web_core::error_catch;
+			error_catch::AnyHttpError::new_msg(error_catch::HttpErrorKind::Json(::serde_json::json!({$($t)*})))
+		}
+	};
 }
 
-pub trait Result2AnyHttpResult {
-    type Output;
-	fn to_result<F:FnMut(String)->(u16,HttpErrorKind)>(self,f:F)->Result<Self::Output, AnyHttpError>;
-}
-
-impl<T, U: ToString> Result2AnyHttpResult for Result<T, U> {
-    type Output = T;
-	fn to_result<F:FnMut(String)->(u16,HttpErrorKind)>(self,mut f:F)->Result<Self::Output, AnyHttpError>{
-        match self {
-            Ok(v) => Ok(v),
-            Err(e) => {
-				let (code,msg) = f(e.to_string());
-				Err(AnyHttpError::new(code, msg))
-			},
-        }
-	}
+#[macro_export]
+macro_rules! html_err {
+    ($status:expr, $text:expr) => {{
+        use $crate::web_core::error_catch;
+        error_catch::AnyHttpError::new($status, error_catch::HttpErrorKind::Html($text))
+    }};
+    ($text:expr) => {{
+        use $crate::web_core::error_catch;
+        error_catch::AnyHttpError::new_msg(error_catch::HttpErrorKind::Html($text))
+    }};
 }
