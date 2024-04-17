@@ -18,6 +18,7 @@ pub use salvo;
 use salvo::conn::rustls::{Keycert, RustlsConfig};
 
 pub async fn serve(config: Config, serve_route: Router) -> anyhow::Result<()> {
+    tokio::fs::create_dir_all(config.pub_dir.clone()).await?;
     let config_provider = InjectConfig(config.clone());
     let _log_guard = log::set_log(config.log);
     db_pool::init_db_if_enable(&config.db_protocol).await?;
