@@ -1,6 +1,6 @@
 host = "[::]:8080"
 pub_dir = "public"
-db_protocol = "mysql://root:root@localhost/database"
+##db_protocol = "mysql://root:root@localhost/database"
 ##db_protocol = "sqlite://database.db"
 route_root = ""
 secret_key = "123456789"
@@ -14,3 +14,7 @@ utcoffset = [8, 0, 0]
 dir = "./cert/"
 cert_file_name = "cert.pem"
 key_file_name = "key.pem"
+
+# [[database]]
+# name = "db_1"
+# protocol = "mysql://root:root@localhost/database"

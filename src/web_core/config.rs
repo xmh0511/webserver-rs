@@ -17,15 +17,20 @@ pub struct Http3 {
     pub cert_file_name: String,
     pub key_file_name: String,
 }
+#[derive(Deserialize, Clone, Debug)]
+pub struct Database {
+    pub name: String,
+    pub protocol: String,
+}
 #[derive(Deserialize, Clone)]
 pub struct Config {
     pub host: String,
     pub pub_dir: String,
     pub log: Log,
-    pub db_protocol: String,
     pub route_root: String,
     pub secret_key: String,
     pub assets_listing: bool,
+    pub database: Option<Vec<Database>>,
     #[cfg(feature = "http3")]
     pub http3: Http3,
 }

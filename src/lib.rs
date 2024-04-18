@@ -29,7 +29,10 @@ pub async fn serve(config: Config, serve_route: Router) -> anyhow::Result<()> {
     tokio::fs::create_dir_all(config.pub_dir.clone()).await?;
     let config_provider = InjectConfig(config.clone());
     let _log_guard = log::set_log(config.log);
-    db_pool::init_db_if_enable(&config.db_protocol).await?;
+    //println!("{:?}",config.database);
+    if let Some(v) = config.database {
+        db_pool::init_db_if_enable(v).await?;
+    }
 
     let root_router = if config.route_root.is_empty() {
         Router::new().hoop(config_provider)
