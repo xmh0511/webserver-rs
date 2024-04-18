@@ -1,6 +1,6 @@
 [package]
 name = "webserver-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "An out-of-the-box web server that is encapsulated based on salvo."
 license = "MIT"
