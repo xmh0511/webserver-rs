@@ -26,11 +26,11 @@ macro_rules! gen_curly_brace {
 
 #[macro_export]
 macro_rules! router {
-	([$($method:ident),+] => $($m:ident)::* $(<**$rest:ident>)?) => {
+	([$($method:ident),+] => @ $($m:ident)::* $(/<**$rest:ident>)?) => {
 		//Router::with_path(acquire_last_ident!($($m)*)).$method($($m)::*)
 		$crate::router!(IN Router::with_path(format!($crate::gen_curly_brace!($($rest)?),$crate::acquire_last_ident!($($m)*),$(format!("/<**{}>",stringify!($rest)))?)), $($m)::* , $($method),+)
 	};
-	([$($method:ident),+] => $(/)? $($prefix:ident)/+ @ $($m:ident)::* $(/<**$rest:ident>)?)=>{
+	([$($method:ident),+] => $(/)? $($prefix:ident)/+ / @ $($m:ident)::* $(/<**$rest:ident>)?)=>{
 		//Router::with_path(format!("{}{}",$prefix,acquire_last_ident!($($m)*))) $(. $method( $($m)::*  ))+
 		$crate::router!(IN Router::with_path(format!($crate::gen_curly_brace!(@ $($rest)?),concat!($(stringify!($prefix),stringify!(/)),+),$crate::acquire_last_ident!($($m)*), $(format!("/<**{}>",stringify!($rest)))?)), $($m)::* , $($method),+)
 	};

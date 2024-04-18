@@ -91,15 +91,15 @@ async fn main() -> anyhow::Result<()> {
 
     webserver_rs::serve_routes! {
         config =>[
-        router!([get, post] => hello)
+        router!([get, post] => @hello)
             .hoop(jwt)
             .hoop(authorization::AuthGuard::new(|_e| html_err!(String::from(
                 "unauthorized"
             )))),
-        router!([get] => /user @ login),
-        router!([get, post] => a/b @ ab::show),
-        router!([get, post, put] => /b/c @ ab::show /<**path>),
-        router!([get, post] => text_json).hoop(build_cros("*")),
+        router!([get] => /user/@login),
+        router!([get, post] => a/b/@ab::show),
+        router!([get, post, put] => /b/c/@ab::show/<**path>),
+        router!([get, post] => @text_json).hoop(build_cros("*")),
         ]
     };
     Ok(())
