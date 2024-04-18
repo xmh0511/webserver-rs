@@ -25,14 +25,14 @@ macro_rules! gen_curly_brace {
 // }
 
 #[macro_export]
-macro_rules! create_router {
+macro_rules! router {
 	([$($method:ident),+] => $($m:ident)::* $(<**$rest:ident>)?) => {
 		//Router::with_path(acquire_last_ident!($($m)*)).$method($($m)::*)
-		$crate::create_router!(IN Router::with_path(format!($crate::gen_curly_brace!($($rest)?),$crate::acquire_last_ident!($($m)*),$(format!("/<**{}>",stringify!($rest)))?)), $($m)::* , $($method),+)
+		$crate::router!(IN Router::with_path(format!($crate::gen_curly_brace!($($rest)?),$crate::acquire_last_ident!($($m)*),$(format!("/<**{}>",stringify!($rest)))?)), $($m)::* , $($method),+)
 	};
 	([$($method:ident),+] => $(/)? $($prefix:ident)/+ @ $($m:ident)::* $(/<**$rest:ident>)?)=>{
 		//Router::with_path(format!("{}{}",$prefix,acquire_last_ident!($($m)*))) $(. $method( $($m)::*  ))+
-		$crate::create_router!(IN Router::with_path(format!($crate::gen_curly_brace!(@ $($rest)?),concat!($(stringify!($prefix),stringify!(/)),+),$crate::acquire_last_ident!($($m)*), $(format!("/<**{}>",stringify!($rest)))?)), $($m)::* , $($method),+)
+		$crate::router!(IN Router::with_path(format!($crate::gen_curly_brace!(@ $($rest)?),concat!($(stringify!($prefix),stringify!(/)),+),$crate::acquire_last_ident!($($m)*), $(format!("/<**{}>",stringify!($rest)))?)), $($m)::* , $($method),+)
 	};
 	(IN $e:expr, $m:path , $($method:ident),+)=>{
 		$e $(.$method($m))+
@@ -64,7 +64,7 @@ pub fn build_cros(allow_origin: &str) -> CorsHandler {
 }
 
 #[macro_export]
-macro_rules! serve_route {
+macro_rules! serve_routes {
 	($c:expr => [$($e:expr),* $(,)?]) => {
 		{
 			use ::salvo::prelude::*;

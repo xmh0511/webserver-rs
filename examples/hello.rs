@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tokio::io::AsyncReadExt;
 use webserver_rs::{
-    assets::MemoryStream, authorization, build_cros, config::Config, create_router, expire_time,
-    html_err, json_err, AnyResult, FromConfigFile,
+    assets::MemoryStream, authorization, build_cros, config::Config, expire_time, html_err,
+    json_err, router, AnyResult, FromConfigFile,
 };
 
 use webserver_rs::web_core::authorization::gen_token;
@@ -89,17 +89,17 @@ async fn main() -> anyhow::Result<()> {
         vec![Box::new(HeaderFinder::new())],
     );
 
-    webserver_rs::serve_route! {
+    webserver_rs::serve_routes! {
         config =>[
-        create_router!([get, post] => hello)
+        router!([get, post] => hello)
             .hoop(jwt)
             .hoop(authorization::AuthGuard::new(|_e| html_err!(String::from(
                 "unauthorized"
             )))),
-        create_router!([get] => /user @ login),
-        create_router!([get, post] => a/b @ ab::show),
-        create_router!([get, post, put] => /b/c @ ab::show /<**path>),
-        create_router!([get, post] => text_json).hoop(build_cros("*")),
+        router!([get] => /user @ login),
+        router!([get, post] => a/b @ ab::show),
+        router!([get, post, put] => /b/c @ ab::show /<**path>),
+        router!([get, post] => text_json).hoop(build_cros("*")),
         ]
     };
     Ok(())
