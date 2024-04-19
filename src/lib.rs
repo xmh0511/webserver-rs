@@ -21,6 +21,7 @@ pub use sea_orm;
 pub use serde;
 pub use serde_json;
 pub use time;
+pub use tokio;
 
 #[cfg(feature = "http3")]
 use salvo::conn::rustls::{Keycert, RustlsConfig};
