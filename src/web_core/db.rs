@@ -13,7 +13,7 @@ async fn init_db_pool(db_info: Vec<DataBaseInfo>) -> Result<(), DbErr> {
     Ok(())
 }
 #[allow(dead_code)]
-pub fn get(key: &String) -> Result<&'static DatabaseConnection, std::io::Error> {
+pub fn get(key: &str) -> Result<&'static DatabaseConnection, std::io::Error> {
     DBCONN_POOL
         .get()
         .ok_or(std::io::Error::new(
