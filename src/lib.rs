@@ -31,7 +31,7 @@ pub async fn serve(config: Config, serve_route: Router) -> anyhow::Result<()> {
     let _log_guard = log::set_log(config.log);
     //println!("{:?}",config.database);
     if let Some(v) = config.database {
-        db_pool::init_db_if_enable(v).await?;
+        db::init_db_if_enable(v).await?;
     }
 
     let root_router = if config.route_root.is_empty() {

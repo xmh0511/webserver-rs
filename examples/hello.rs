@@ -100,6 +100,7 @@ async fn main() -> anyhow::Result<()> {
         router!([get, post] => a/b/@ab::show),
         router!([get, post, put] => /b/c/@ab::show/<**path>),
         router!([get, post] => @text_json).hoop(build_cros("*")),
+        router!([get, post] => ...@ab::show).hoop(build_cros("*")),
         ]
     };
     Ok(())
