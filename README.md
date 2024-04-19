@@ -101,6 +101,13 @@ mod ab {
     pub fn show() -> &'static str {
         "abc"
     }
+
+    pub mod shop{
+        #[super::handler]
+        pub fn show() -> &'static str {
+            "show"
+        } 
+    }
 }
 
 #[tokio::main]
@@ -126,6 +133,8 @@ async fn main() -> anyhow::Result<()> {
 			webserver_rs::router!([get, post] => /b/c/@ab::show/<**path>),
 		// http://localhost:8080/test_json
 			webserver_rs::router!([get, post] => @text_json).hoop(build_cros("*")),
+        // http://localhost:8080/ab/shop/show    
+            webserver_rs::router!([get, post] => ...@ab::shop::show).hoop(build_cros("*")),
 	    ]
 	};
     Ok(())
