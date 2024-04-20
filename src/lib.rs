@@ -1,9 +1,9 @@
 pub mod route;
 pub mod web_core;
 
-pub use web_core::*;
-
+pub use assets::MemoryStream;
 pub use web_core::config::*;
+pub use web_core::*;
 
 pub use web_core::error_catch::*;
 
@@ -67,4 +67,12 @@ pub async fn serve(config: Config, serve_route: Router) -> anyhow::Result<()> {
         Server::new(acceptor).serve(root_router).await;
     }
     Ok(())
+}
+
+pub mod prelude {
+    pub use crate::config::Config;
+    pub use config_file::FromConfigFile;
+    pub use salvo;
+    pub use serde;
+    pub use tokio;
 }
