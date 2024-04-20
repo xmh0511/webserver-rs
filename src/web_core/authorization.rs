@@ -4,7 +4,7 @@ use salvo::prelude::*;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use crate::web_core::error_catch::AnyHttpError;
+use crate::web_core::http_error::AnyHttpError;
 use crate::HttpErrorKind;
 
 #[allow(dead_code)]

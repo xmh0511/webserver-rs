@@ -2,10 +2,10 @@ pub mod route;
 pub mod web_core;
 
 pub use assets::MemoryStream;
-pub use web_core::config::*;
+pub use web_core::config;
 pub use web_core::*;
 
-pub use web_core::error_catch::*;
+pub use web_core::http_error::*;
 
 use salvo::prelude::*;
 
@@ -26,9 +26,9 @@ pub use tokio;
 #[cfg(feature = "http3")]
 use salvo::conn::rustls::{Keycert, RustlsConfig};
 
-pub async fn serve(config: Config, serve_route: Router) -> anyhow::Result<()> {
+pub async fn serve(config: config::Config, serve_route: Router) -> anyhow::Result<()> {
     tokio::fs::create_dir_all(config.pub_dir.clone()).await?;
-    let config_provider = InjectConfig(config.clone());
+    let config_provider = config::InjectConfig(config.clone());
     let _log_guard = log::set_log(config.log);
     //println!("{:?}",config.database);
     if let Some(v) = config.database {

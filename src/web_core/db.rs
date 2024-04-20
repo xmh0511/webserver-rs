@@ -13,6 +13,7 @@ async fn init_db_pool(db_info: Vec<DataBaseInfo>) -> Result<(), DbErr> {
     Ok(())
 }
 #[allow(dead_code)]
+#[cfg(any(feature = "mysql", feature = "sqlite", feature = "postgres"))]
 pub fn get(key: &str) -> Result<&'static DatabaseConnection, std::io::Error> {
     DBCONN_POOL
         .get()

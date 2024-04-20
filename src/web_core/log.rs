@@ -4,7 +4,7 @@ use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::fmt::time::OffsetTime;
 
 #[allow(dead_code)]
-pub fn set_log(config: Log) -> Option<WorkerGuard> {
+pub(crate) fn set_log(config: Log) -> Option<WorkerGuard> {
     let local_time = OffsetTime::new(
         UtcOffset::from_hms(
             config.utcoffset[0],

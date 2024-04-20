@@ -2,7 +2,8 @@ use salvo::prelude::*;
 
 use serde_json::Value;
 
-pub type AnyResult<T> = Result<T, AnyHttpError>;
+pub type HttpResult<T> = Result<T, AnyHttpError>;
+
 #[allow(dead_code)]
 pub enum HttpErrorKind {
     Json(Value),
@@ -39,14 +40,14 @@ impl Writer for AnyHttpError {
 macro_rules! json_err {
 	($status:expr, {$($t:tt)*}) => {
 		{
-			use $crate::web_core::error_catch;
-			error_catch::AnyHttpError::new($status,error_catch::HttpErrorKind::Json(::serde_json::json!({$($t)*})))
+			use $crate::web_core::http_error;
+			http_error::AnyHttpError::new($status,http_error::HttpErrorKind::Json(::serde_json::json!({$($t)*})))
 		}
 	};
 	({$($t:tt)*}) => {
 		{
-			use $crate::web_core::error_catch;
-			error_catch::AnyHttpError::new_msg(error_catch::HttpErrorKind::Json(::serde_json::json!({$($t)*})))
+			use $crate::web_core::http_error;
+			http_error::AnyHttpError::new_msg(http_error::HttpErrorKind::Json(::serde_json::json!({$($t)*})))
 		}
 	};
 }
@@ -54,11 +55,11 @@ macro_rules! json_err {
 #[macro_export]
 macro_rules! html_err {
     ($status:expr, $text:expr) => {{
-        use $crate::web_core::error_catch;
-        error_catch::AnyHttpError::new($status, error_catch::HttpErrorKind::Html($text))
+        use $crate::web_core::http_error;
+        http_error::AnyHttpError::new($status, http_error::HttpErrorKind::Html($text.into()))
     }};
     ($text:expr) => {{
-        use $crate::web_core::error_catch;
-        error_catch::AnyHttpError::new_msg(error_catch::HttpErrorKind::Html($text))
+        use $crate::web_core::http_error;
+        http_error::AnyHttpError::new_msg(http_error::HttpErrorKind::Html($text.into()))
     }};
 }

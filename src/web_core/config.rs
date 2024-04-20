@@ -37,7 +37,7 @@ pub struct Config {
 
 #[cfg(feature = "http3")]
 #[allow(dead_code)]
-pub async fn read_cert_and_key(config: Http3) -> Result<(Vec<u8>, Vec<u8>), anyhow::Error> {
+pub(crate) async fn read_cert_and_key(config: Http3) -> Result<(Vec<u8>, Vec<u8>), anyhow::Error> {
     let cert_root_path = PathBuf::from(config.dir);
     let cert_path = cert_root_path.join(config.cert_file_name);
     let key_path = cert_root_path.join(config.key_file_name);
@@ -47,7 +47,7 @@ pub async fn read_cert_and_key(config: Http3) -> Result<(Vec<u8>, Vec<u8>), anyh
     Ok((cert, key))
 }
 
-pub struct InjectConfig(pub Config);
+pub(crate) struct InjectConfig(pub(crate) Config);
 #[handler]
 impl InjectConfig {
     async fn handle(

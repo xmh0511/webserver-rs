@@ -1,10 +1,12 @@
-use salvo::{jwt_auth::HeaderFinder, prelude::*};
+use salvo::jwt_auth::HeaderFinder;
+use salvo::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tokio::io::AsyncReadExt;
+use webserver_rs::prelude::*;
 use webserver_rs::{
-    assets::MemoryStream, authorization, build_cros, config::Config, expire_time, html_err,
-    json_err, router, AnyResult, FromConfigFile,
+    authorization, build_cros, config::Config, expire_time, html_err, json_err, router,
+    FromConfigFile, HttpResult, MemoryStream,
 };
 
 use webserver_rs::web_core::authorization::gen_token;
@@ -16,7 +18,7 @@ struct JwtClaim {
 }
 
 #[handler]
-pub fn hello(req: &mut Request, res: &mut Response) -> AnyResult<()> {
+pub fn hello(req: &mut Request, res: &mut Response) -> HttpResult<()> {
     let c = req.query::<String>("id");
     println!("{c:?}");
     let p = req.query::<String>("id").ok_or(html_err!(
@@ -32,7 +34,7 @@ pub fn hello(req: &mut Request, res: &mut Response) -> AnyResult<()> {
 }
 
 #[handler]
-pub fn login(depot: &mut Depot, res: &mut Response) -> AnyResult<()> {
+pub fn login(depot: &mut Depot, res: &mut Response) -> HttpResult<()> {
     let config = depot.obtain::<Config>().map_err(|_e| {
         crate::json_err!(400,{
             "status":"fail",
@@ -52,17 +54,17 @@ pub fn login(depot: &mut Depot, res: &mut Response) -> AnyResult<()> {
 }
 
 #[handler]
-pub async fn image(res: &mut Response) -> AnyResult<()> {
+pub async fn image(res: &mut Response) -> HttpResult<()> {
     let mut file = tokio::fs::File::open("./test.png")
         .await
-        .map_err(|_| crate::html_err!(404, "".to_string()))?;
+        .map_err(|_| crate::html_err!(404, ""))?;
     let mut s = Vec::new();
     file.read_to_end(&mut s).await.unwrap();
     res.stream(MemoryStream::new(s, 200));
     Ok(())
 }
 #[handler]
-pub async fn text_json(res: &mut Response) -> AnyResult<()> {
+pub async fn text_json(res: &mut Response) -> HttpResult<()> {
     res.render(Text::Json(
         json!({
             "title":1
@@ -98,15 +100,19 @@ async fn main() -> anyhow::Result<()> {
 
     webserver_rs::serve_routes! {
         config =>[
+        // http://localhost:8080/hello
         router!([get, post] => @hello)
             .hoop(jwt)
-            .hoop(authorization::AuthGuard::new(|_e| html_err!(String::from(
-                "unauthorized"
-            )))),
+            .hoop(authorization::AuthGuard::new(|_e| html_err!("unauthorized"))),
+        // http://localhost:8080/user/login
         router!([get] => /user/@login),
+        // http://localhost:8080/a/b/show
         router!([get, post] => a/b/@ab::show),
+        // http://localhost:8080/b/c/show/*
         router!([get, post, put] => /b/c/@ab::show/<**path>),
+        // http://localhost:8080/test_json
         router!([get, post] => @text_json).hoop(build_cros("*")),
+        // http://localhost:8080/ab/shop/show
         router!([get, post] => ...@ab::shop::show).hoop(build_cros("*")),
         ]
     };

@@ -3,7 +3,7 @@ use std::{collections::VecDeque, task::Poll};
 use futures::Stream;
 use salvo::{http::HeaderMap, prelude::*};
 
-use crate::AnyResult;
+use crate::HttpResult;
 
 #[allow(dead_code)]
 pub(crate) fn common_assets(pub_dir: String, listing: bool) -> Router {
@@ -15,7 +15,7 @@ pub(crate) fn common_assets(pub_dir: String, listing: bool) -> Router {
 }
 
 #[handler]
-pub(crate) async fn favicon_ico(res: &mut Response) -> AnyResult<()> {
+pub(crate) async fn favicon_ico(res: &mut Response) -> HttpResult<()> {
     res.send_file("./favicon.ico", &HeaderMap::new()).await;
     Ok(())
 }
