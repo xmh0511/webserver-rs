@@ -30,7 +30,8 @@ pub async fn serve(config: config::Config, serve_route: Router) -> anyhow::Resul
     tokio::fs::create_dir_all(config.pub_dir.clone()).await?;
     let config_provider = config::InjectConfig(config.clone());
     let _log_guard = log::set_log(config.log);
-    //println!("{:?}",config.database);
+
+    #[cfg(any(feature = "mysql", feature = "sqlite", feature = "postgres"))]
     if let Some(v) = config.database {
         db::init_db_if_enable(v).await?;
     }
