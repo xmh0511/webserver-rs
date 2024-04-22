@@ -40,7 +40,7 @@ impl<F> AuthGuard<F>
 where
     F: Fn(JwtAuthState) -> AnyHttpError + Send + Sync + 'static,
 {
-	/// Construct the guard with a handler on how to respond to the clients when validation failed
+    /// Construct the guard with a handler on how to respond to the clients when validation failed
     pub fn new(f: F) -> Self {
         Self { f }
     }

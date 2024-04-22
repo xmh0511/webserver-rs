@@ -1,3 +1,5 @@
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
 pub mod route;
 pub mod web_core;
 
@@ -71,6 +73,7 @@ pub async fn serve(config: config::Config, serve_route: Router) -> anyhow::Resul
 
 pub mod prelude {
     pub use crate::config::Config;
+    pub use crate::http_error::HttpResult;
     pub use anyhow;
     pub use chrono;
     pub use config_file::FromConfigFile;
@@ -79,5 +82,4 @@ pub mod prelude {
     pub use serde_json;
     pub use time;
     pub use tokio;
-	pub use crate::http_error::HttpResult;
 }

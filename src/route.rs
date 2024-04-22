@@ -79,7 +79,7 @@ pub fn build_cros(allow_origin: &str) -> CorsHandler {
         .into_handler()
 }
 
-/// Start the service with the provided config and defined routers
+/// Start the service with the provided config and defined routers, optionally followed by a list of middleware
 #[macro_export]
 macro_rules! serve_routes {
 	($c:expr => [$($e:expr),* $(,)?] $(& [$($hoop:expr),+ $(,)?])?) => {
