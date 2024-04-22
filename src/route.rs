@@ -78,10 +78,10 @@ pub fn build_cros(allow_origin: &str) -> CorsHandler {
 
 #[macro_export]
 macro_rules! serve_routes {
-	($c:expr => [$($e:expr),* $(,)?]) => {
+	($c:expr => [$($e:expr),* $(,)?] $(& [$($hoop:expr),+ $(,)?])?) => {
 		{
 			use $crate::salvo::prelude::*;
-			let router = Router::new() $(.push($e))*;
+			let router = Router::new() $($(.hoop($hoop))+)? $(.push($e))*;
 			$crate::serve($c, router).await.unwrap();
 		}
 	};

@@ -3,6 +3,17 @@ use time::{macros::format_description, UtcOffset};
 use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::fmt::time::OffsetTime;
 
+fn level_map(level: &str) -> tracing::Level {
+    match level {
+        "debug" => tracing::Level::DEBUG,
+        "info" => tracing::Level::INFO,
+        "error" => tracing::Level::ERROR,
+        "warn" => tracing::Level::WARN,
+        "trace" => tracing::Level::TRACE,
+        _ => panic!("invalid log level"),
+    }
+}
+
 #[allow(dead_code)]
 pub(crate) fn set_log(config: Log) -> Option<WorkerGuard> {
     let local_time = OffsetTime::new(
@@ -19,12 +30,15 @@ pub(crate) fn set_log(config: Log) -> Option<WorkerGuard> {
         let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
         tracing_subscriber::fmt()
             .with_timer(local_time)
-            .with_max_level(tracing::Level::INFO)
+            .with_max_level(level_map(&config.level))
             .with_writer(non_blocking)
             .init();
         Some(guard)
     } else {
-        tracing_subscriber::fmt().with_timer(local_time).init();
+        tracing_subscriber::fmt()
+            .with_timer(local_time)
+            .with_max_level(level_map(&config.level))
+            .init();
         None
     }
 }

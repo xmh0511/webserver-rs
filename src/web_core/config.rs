@@ -10,6 +10,7 @@ pub struct Log {
     pub dir: String,
     pub prefix: String,
     pub utcoffset: [i8; 3],
+    pub level: String,
 }
 #[derive(Deserialize, Clone)]
 pub struct Http3 {

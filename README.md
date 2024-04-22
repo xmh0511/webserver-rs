@@ -136,7 +136,7 @@ async fn main() -> anyhow::Result<()> {
         router!([get, post] => @text_json).hoop(build_cros("*")),
         // http://localhost:8080/ab/shop/show    
         router!([get, post] => ...@ab::shop::show).hoop(build_cros("*")),
-        ]
+        ]  // (& [middlewares,])?
     };
     Ok(())
 }

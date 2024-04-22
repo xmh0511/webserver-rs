@@ -99,10 +99,9 @@ async fn main() -> anyhow::Result<()> {
     );
 
     webserver_rs::serve_routes! {
-        config =>[
+        config => [
         // http://localhost:8080/hello
         router!([get, post] => @hello)
-            .hoop(jwt)
             .hoop(authorization::AuthGuard::new(|_e| html_err!("unauthorized"))),
         // http://localhost:8080/user/login
         router!([get] => /user/@login),
@@ -114,7 +113,7 @@ async fn main() -> anyhow::Result<()> {
         router!([get, post] => @text_json).hoop(build_cros("*")),
         // http://localhost:8080/ab/shop/show
         router!([get, post] => ...@ab::shop::show).hoop(build_cros("*")),
-        ]
+        ] & [jwt, /*Middlewares*/]
     };
     Ok(())
 }

@@ -9,6 +9,7 @@ assets_listing = true
 dir = "./log"
 prefix = "webserver.log"
 utcoffset = [8, 0, 0]
+level = "debug" # debug, info, error, warn, trace
 
 [http3]
 dir = "./cert/"

@@ -1,5 +1,5 @@
 use crate::config::Database as DataBaseInfo;
-use sea_orm::{Database, DatabaseConnection, DbErr};
+use sea_orm::{ConnectOptions, Database, DatabaseConnection, DbErr};
 use std::{collections::HashMap, sync::OnceLock};
 
 static DBCONN_POOL: OnceLock<HashMap<String, DatabaseConnection>> = OnceLock::new();
@@ -7,7 +7,10 @@ static DBCONN_POOL: OnceLock<HashMap<String, DatabaseConnection>> = OnceLock::ne
 async fn init_db_pool(db_info: Vec<DataBaseInfo>) -> Result<(), DbErr> {
     let mut map = HashMap::new();
     for db in db_info {
-        map.insert(db.name, Database::connect(db.protocol).await?);
+        let opt = ConnectOptions::new(db.protocol)
+            .sqlx_logging(false)
+            .to_owned();
+        map.insert(db.name, Database::connect(opt).await?);
     }
     _ = DBCONN_POOL.set(map);
     Ok(())
