@@ -8,6 +8,7 @@ use crate::web_core::http_error::AnyHttpError;
 use crate::HttpErrorKind;
 
 #[allow(dead_code)]
+/// Generate a jwt middleware with the provided parameters
 pub fn gen_jwt_auth<T: Send + Sync + DeserializeOwned + 'static>(
     secret_key: String,
     finders: Vec<Box<dyn JwtTokenFinder>>,
@@ -18,6 +19,7 @@ pub fn gen_jwt_auth<T: Send + Sync + DeserializeOwned + 'static>(
 }
 
 #[allow(dead_code)]
+/// Generate a jwt with the provided parameters
 pub fn gen_token<T: Serialize + Send + Sync + 'static>(
     secret_key: String,
     claim: T,
@@ -28,6 +30,8 @@ pub fn gen_token<T: Serialize + Send + Sync + 'static>(
         &EncodingKey::from_secret(secret_key.as_bytes()),
     )
 }
+
+/// JWT Guard middleware that checks the validation of the request before entry of the handler
 pub struct AuthGuard<F: Fn(JwtAuthState) -> AnyHttpError + Send + Sync + 'static> {
     f: F,
 }
@@ -36,6 +40,7 @@ impl<F> AuthGuard<F>
 where
     F: Fn(JwtAuthState) -> AnyHttpError + Send + Sync + 'static,
 {
+	/// Construct the guard with a handler on how to respond to the clients when validation failed
     pub fn new(f: F) -> Self {
         Self { f }
     }

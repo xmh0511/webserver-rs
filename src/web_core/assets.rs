@@ -20,6 +20,7 @@ pub(crate) async fn favicon_ico(res: &mut Response) -> HttpResult<()> {
     Ok(())
 }
 
+/// Response to the clients with the memory data by streaming
 pub struct MemoryStream(VecDeque<Vec<u8>>);
 
 impl MemoryStream {

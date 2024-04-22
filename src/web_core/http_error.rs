@@ -2,6 +2,7 @@ use salvo::prelude::*;
 
 use serde_json::Value;
 
+/// The unified error process for HTTP, uses macros `json_err` or `html_err` to easily handle errors
 pub type HttpResult<T> = Result<T, AnyHttpError>;
 
 #[allow(dead_code)]
@@ -36,6 +37,7 @@ impl Writer for AnyHttpError {
     }
 }
 
+/// Respond to clients an error with JSON data structure
 #[macro_export]
 macro_rules! json_err {
 	($status:expr, {$($t:tt)*}) => {
@@ -52,6 +54,7 @@ macro_rules! json_err {
 	};
 }
 
+/// Respond to clients an error with html
 #[macro_export]
 macro_rules! html_err {
     ($status:expr, $text:expr) => {{

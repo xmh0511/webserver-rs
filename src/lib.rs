@@ -17,7 +17,6 @@ pub use salvo;
 pub use anyhow;
 pub use chrono;
 pub use futures;
-pub use sea_orm;
 pub use serde;
 pub use serde_json;
 pub use time;
@@ -72,8 +71,13 @@ pub async fn serve(config: config::Config, serve_route: Router) -> anyhow::Resul
 
 pub mod prelude {
     pub use crate::config::Config;
+    pub use anyhow;
+    pub use chrono;
     pub use config_file::FromConfigFile;
     pub use salvo;
     pub use serde;
+    pub use serde_json;
+    pub use time;
     pub use tokio;
+	pub use crate::http_error::HttpResult;
 }

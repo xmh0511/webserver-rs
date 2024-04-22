@@ -34,6 +34,8 @@ macro_rules! stringlize_path {
 // 	};
 // }
 
+/// Construct a router
+/// > `/`<sub>opt</sub> `path1/path2/`<sub>opt</sub> @controller `/<**wildcard_path>`<sub>opt</sub>
 #[macro_export]
 macro_rules! router {
 	([$($method:ident),+] => @ $($m:ident)::* $(/<**$rest:ident>)?) => {
@@ -62,6 +64,7 @@ macro_rules! acquire_last_ident {
 	}
 }
 
+/// Construct a middleware to allow Cross-origin
 #[allow(dead_code)]
 pub fn build_cros(allow_origin: &str) -> CorsHandler {
     Cors::new()
@@ -76,6 +79,7 @@ pub fn build_cros(allow_origin: &str) -> CorsHandler {
         .into_handler()
 }
 
+/// Start the service with the provided config and defined routers
 #[macro_export]
 macro_rules! serve_routes {
 	($c:expr => [$($e:expr),* $(,)?] $(& [$($hoop:expr),+ $(,)?])?) => {
