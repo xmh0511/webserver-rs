@@ -1,6 +1,7 @@
 use salvo::cors::{Cors, CorsHandler};
 use salvo::http::Method;
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! gen_curly_brace {
     ($i:ident) => {
@@ -17,6 +18,7 @@ macro_rules! gen_curly_brace {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! stringlize_path {
 	($id:ident {$($t:tt)*})=>{
@@ -54,6 +56,7 @@ macro_rules! router {
 	};
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! acquire_last_ident {
 	($ide:ident $($ids:ident)+) => {
@@ -79,7 +82,7 @@ pub fn build_cros(allow_origin: &str) -> CorsHandler {
         .into_handler()
 }
 
-/// Start the service with the provided config and defined routers, optionally followed by a list of middleware
+/// Start the service with the provided config and defined routers, optionally followed by a list of middleware(globally)
 #[macro_export]
 macro_rules! serve_routes {
 	($c:expr => [$($e:expr),* $(,)?] $(& [$($hoop:expr),+ $(,)?])?) => {

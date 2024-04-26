@@ -24,6 +24,7 @@ pub(crate) async fn favicon_ico(res: &mut Response) -> HttpResult<()> {
 pub struct MemoryStream(VecDeque<Vec<u8>>);
 
 impl MemoryStream {
+    /// Construct a `MemoryStream` by binary data and a required fragment size
     #[allow(dead_code)]
     pub fn new(data: Vec<u8>, chunk_size: usize) -> Self {
         Self(data.chunks(chunk_size).map(|v| v.to_vec()).collect())

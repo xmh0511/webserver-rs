@@ -89,6 +89,7 @@ where
     }
 }
 
+/// Conveniently generate an expiration time for a JWT
 #[macro_export]
 macro_rules! expire_time {
     (Days($day:expr)) => {{

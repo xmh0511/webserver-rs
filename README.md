@@ -2,16 +2,18 @@
 An out-of-the-box web server that is encapsulated based on salvo. 
 
 ### Use DataBase (sea-orm)
-1. Enable one of the following features, depending on what you need
+1. Add `sea-orm` dependency in your Cargo.toml 
+
+2. Enable one of the following features or multiple, depending on what kind of databases you need
 > - mysql 
 > - sqlite
 > - postgres
 
 
-2. Run the following command if you want to use database
+3. Run the following command, see [sea-orm documentation](https://www.sea-ql.org/SeaORM/docs/generate-entity/sea-orm-cli/)
 > - sea-orm-cli generate entity -o src/model
 
-3. Import the generated model in your `main.rs` file
+4. Import the generated model in your `main.rs` file
 > - mod model;
 
 ### Use Http3

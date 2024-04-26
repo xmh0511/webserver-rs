@@ -2,7 +2,7 @@ use salvo::prelude::*;
 
 use serde_json::Value;
 
-/// The unified error process for HTTP, uses macros `json_err` or `html_err` to easily handle errors
+/// The unified error process for HTTP. Using macros `json_err` and `html_err` to conveniently return errors
 pub type HttpResult<T> = Result<T, AnyHttpError>;
 
 #[allow(dead_code)]
@@ -14,6 +14,7 @@ pub enum HttpErrorKind {
 pub struct AnyHttpError(pub(crate) Option<StatusCode>, pub(crate) HttpErrorKind);
 
 impl AnyHttpError {
+    /// Construct an `AnyHttpError` by an HTTP status code and a specific error message
     #[allow(dead_code)]
     pub fn new(code: u16, msg: HttpErrorKind) -> Self {
         Self(
@@ -21,6 +22,8 @@ impl AnyHttpError {
             msg,
         )
     }
+    /// Construct an `AnyHttpError` by only a specific error message
+    /// HTTP status is context-dependent
     pub fn new_msg(msg: HttpErrorKind) -> Self {
         Self(None, msg)
     }
@@ -38,6 +41,11 @@ impl Writer for AnyHttpError {
 }
 
 /// Respond to clients an error with JSON data structure
+/// 1. Specify HTTP status code and the response data
+/// > json_err!(code, data)
+///
+/// 2. Just specify the response data, the HTTP status code is context-dependent
+/// > json_err!(data)
 #[macro_export]
 macro_rules! json_err {
 	($status:expr, {$($t:tt)*}) => {
@@ -54,7 +62,8 @@ macro_rules! json_err {
 	};
 }
 
-/// Respond to clients an error with html
+/// Respond to clients an error with html structure string
+/// A similar usage as `json_err`
 #[macro_export]
 macro_rules! html_err {
     ($status:expr, $text:expr) => {{
