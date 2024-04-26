@@ -1,5 +1,5 @@
 ### Feature
-An out-of-the-box web server that is encapsulated based on salvo. 
+An out-of-the-box web server framework that is encapsulated based on salvo and sea-orm. 
 
 ### Use DataBase (sea-orm)
 1. Add `sea-orm` dependency in your Cargo.toml 
@@ -16,8 +16,10 @@ An out-of-the-box web server that is encapsulated based on salvo.
 4. Import the generated model in your `main.rs` file
 > - mod model;
 
+5. which databases are used is configurable in `config.toml`
+
 ### Use Http3
-Enable `http3` feature  
+Enable `http3` feature and config the relevant certificates in `config.toml`
 
 
 ### Example:
