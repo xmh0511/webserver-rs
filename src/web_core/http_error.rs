@@ -51,13 +51,13 @@ macro_rules! json_err {
 	($status:expr, {$($t:tt)*}) => {
 		{
 			use $crate::web_core::http_error;
-			http_error::AnyHttpError::new($status,http_error::HttpErrorKind::Json(::serde_json::json!({$($t)*})))
+			http_error::AnyHttpError::new($status,http_error::HttpErrorKind::Json($crate::serde_json::json!({$($t)*})))
 		}
 	};
 	({$($t:tt)*}) => {
 		{
 			use $crate::web_core::http_error;
-			http_error::AnyHttpError::new_msg(http_error::HttpErrorKind::Json(::serde_json::json!({$($t)*})))
+			http_error::AnyHttpError::new_msg(http_error::HttpErrorKind::Json($crate::serde_json::json!({$($t)*})))
 		}
 	};
 }

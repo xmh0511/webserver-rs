@@ -1,8 +1,8 @@
 [package]
 name = "webserver-rs"
-version = "0.5.0"
+version = "0.5.1"
 edition = "2021"
-description = "An out-of-the-box web server that is encapsulated based on salvo."
+description = "An out-of-the-box web server framework that is encapsulated based on salvo and sea-orm."
 license = "MIT"
 repository = "https://github.com/xmh0511/webserver-rs"
 
