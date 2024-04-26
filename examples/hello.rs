@@ -12,6 +12,7 @@ use webserver_rs::{
 use webserver_rs::web_core::authorization::gen_token;
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(crate = "serde")]
 struct JwtClaim {
     username: String,
     exp: i64,
