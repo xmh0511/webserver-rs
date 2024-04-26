@@ -93,27 +93,27 @@ where
 #[macro_export]
 macro_rules! expire_time {
     (Days($day:expr)) => {{
-        use time::{Duration, OffsetDateTime};
+        use $crate::time::{Duration, OffsetDateTime};
         let tmp = OffsetDateTime::now_utc() + Duration::days($day);
         tmp.unix_timestamp()
     }};
     (Weeks($w:expr)) => {{
-        use time::{Duration, OffsetDateTime};
+        use $crate::time::{Duration, OffsetDateTime};
         let tmp = OffsetDateTime::now_utc() + Duration::weeks($w);
         tmp.unix_timestamp()
     }};
     (Hours($h:expr)) => {{
-        use time::{Duration, OffsetDateTime};
+        use $crate::time::{Duration, OffsetDateTime};
         let tmp = OffsetDateTime::now_utc() + Duration::hours($h);
         tmp.unix_timestamp()
     }};
     (Minutes($m:expr)) => {{
-        use time::{Duration, OffsetDateTime};
+        use $crate::time::{Duration, OffsetDateTime};
         let tmp = OffsetDateTime::now_utc() + Duration::minutes($m);
         tmp.unix_timestamp()
     }};
     (Seconds($s:expr)) => {{
-        use time::{Duration, OffsetDateTime};
+        use $crate::time::{Duration, OffsetDateTime};
         let tmp = OffsetDateTime::now_utc() + Duration::seconds($s);
         tmp.unix_timestamp()
     }};
